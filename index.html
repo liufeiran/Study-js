@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+<title></title>
+<link rel="stylesheet" type="text/css" href="css/reset.min.css" charset="UTF-8" />
+<link rel="stylesheet" type="text/css" href="css/swiper.min.css" />
+<link rel="stylesheet" type="text/css" href="css/style.css" />
+</head>
+<body>
+<section class="main">
+	<!--music-->
+	<div class="music" id="musicMenu">
+		<audio src="img/sqdsf.mp3" preload="none" loop id="musicAudio"></audio>
+		<!--显示控件controls，提前加载preload="auto加载页面的时候就加载  metadata只加载头信息 none不加载"，播放完成后是否循环loop，刚加载页面的时候就加载autoplay写这个preload就没有用了，如果想优化性能自动播放就要用js写-->
+		<!--<audio>
+			<source src="img/sqdsf.mp3" type="audio/mpeg"></source>
+			<source src="img/sqdsf.wav" type="audio/wav"></source>
+			<source src="img/sqdsf.ogg" type="audio/ogg"></source>
+		</audio>-->
+	</div>
+	<!--container-->
+	<div class="swiper-container">
+		<div class="swiper-wrapper">
+			<!--slide1-->
+			<div class="swiper-slide page1">
+				<img src="img/3f57.png" />
+				<img src="img/png-0047.png" />
+				<img src="img/png-0238.png" />
+				<img src="img/11.png" />
+			</div>
+			<!--slide2-->
+			<div class="swiper-slide page2">
+				<img src="img/png-0660.png" />
+				<img src="img/png-0235.png" />
+				<img src="img/12.png" />
+			</div>
+		</div>
+	</div>
+	<!--arrow-->
+	<div class="arrow"></div>
+	
+</section>
+
+
+<script type="text/javascript" charset="UTF-8" src="js/swiper.min.js"></script>
+<script type="text/javascript" charset="UTF-8" src="js/fastclick.min.js"></script>
+<script type="text/javascript" charset="UTF-8">
+FastClick.attach(document.body);
+//手机横屏要用@media来调
+~function(){
+	var desW = 640, winW = document.documentElement.clientWidth, ratio = winW / desW, oMain = document.querySelector('.main');
+	if(winW > desW){
+		//设置最大值（640），不让大屏拉伸
+		oMain.style.margin = '0 auto';
+		oMain.style.width = desW + 'px';
+		return;
+	}
+	document.documentElement.style.fontSize = ratio * 100 + 'px';
+}();
+//初始化swiper
+new Swiper('.swiper-container', {
+	direction: 'vertical',//滑动方向
+	loop: true,
+	//当切换结束后，给当前展示的区域添加对应的ID，由此实现对应的动画效果
+	//onSlideChangeEnd，当过度动画结束后执行的回调函数，接收swiper实例作为参数
+	onSlideChangeEnd: function(swiper){
+		//slideAry:获取当前一共有多少个swiper-slide（包含loop模式下前后多加的两个）
+		//curIn:当前展示这个区域的索引
+		//total:一共有多少个轮播区域
+		var slideAry = swiper.slides, curIn = swiper.activeIndex, total = slideAry.length;
+		//计算ID是PAGE?
+		var targetId = 'page';//目标id
+		switch (curIn){//判断当前活动块的索引
+			case 0://如果curIn的值为0
+				targetId += total - 2;//让目标id变为放在最前面的那块
+				break;
+			case total-1://如果curIn的值为最后一个
+				targetId += 1;//让目标id变为放在最后面的那块，就是第一张
+				break;
+			default:
+				targetId += curIn;//其他的情况，目标id和当前索引一样
+		}
+		//给当前的活动块设置id即可,还要把其余的移除
+		//slideAry[curIn]->所有的活动块[当前活动块索引]->当前的活动块，加id ->targetId
+		//slideAry是类数组，借用数组原型上的forEach方法把类数组转化为数组，.call改变里面的this为slideAry，循环整个数组，如果当前索引和index相等就是设置
+		//item：当前数组这一项，  index：当前数组这一项的索引         所以：item <=> slideAry[curIn]
+		[].forEach.call(slideAry, function (item,index){
+			if(curIn === index){
+				item.id = targetId;
+				return;
+			}
+			item.id = null;
+		});
+	}
+});
+//music
+~function(){
+	var musicMenu = document.getElementById('musicMenu'), musicAudio = document.getElementById('musicAudio');
+	//移动端用click事件有300毫秒延迟，因为它在等看是单击还是双击
+	musicMenu.addEventListener('click', function(){
+		if(musicAudio.paused){//如果当前是暂停状态，加d是获取状态
+			musicAudio.play();//播放
+			musicMenu.className = 'music move';
+			return;
+		}
+		musicAudio.pause();//不加d是执行方法暂停
+		musicMenu.className = 'music';
+	}, false);
+	function controlMusic(){
+		musicAudio.volume = 0.3;//控制音量
+		musicAudio.play();//播放
+		musicAudio.addEventListener('canplay', function(){//添加2级事件，能播放时干什么
+			musicMenu.style.display = 'block';//显示图片
+			musicMenu.className = 'music move';//添加move样式，能旋转
+		}, false);//false冒泡阶段
+	}
+	window.setTimeout(controlMusic, 1000);
+}();
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
